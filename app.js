@@ -38,6 +38,10 @@ app.get("/", function (req, res) {
 
 app.post("/", function (req, res) {
   console.log(req.body.employeeID);
+  res.render("timeInOut", {
+    date: currentDay,
+    time: currentTime,
+  });
 });
 
 app.listen(3000, function () {
