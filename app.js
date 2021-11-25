@@ -41,14 +41,14 @@ app.post("/", function (req, res) {
   const pin = req.body.pin;
   Record.findOne({ pin: pin }, function (err, found) {
     if (found) {
-      res.render("timeInOut");
+      res.redirect("/dtr");
     } else {
       console.log(err);
     }
   });
 });
 
-app.post("/newEntry", function (req, res) {
+app.post("/dtr", function (req, res) {
   console.log(currentTime);
   res.render("timeInOut");
 });
