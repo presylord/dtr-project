@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const _ = require("lodash");
 const ejs = require("ejs");
 
 const app = express();
@@ -10,14 +11,20 @@ app.set("view engine", "ejs");
 mongoose.connect("mongodb://localhost:27017/employeesDB");
 
 const recordSchema = new mongoose.Schema({
-  user: "string",
-  pin: "Number",
-  timeIn: "string",
-  timeOut: "string",
+  user: String,
+  pin: Number,
+  entry: [
+    {
+      date: String,
+      timeIn: String,
+      timeOut: String,
+    },
+  ],
 });
 
 const Record = mongoose.model("Record", recordSchema);
 
+//////////////////////////// Current Date ///////////////////////
 const today = new Date();
 const time = {
   hour: "2-digit",
@@ -29,10 +36,10 @@ const day = {
   day: "numeric",
   weekday: "short",
 };
-
 const currentDay = today.toLocaleString("en-US", day);
 const currentTime = today.toLocaleString("en-US", time);
 
+/////////////////////////////////////////////////////////////////
 app.get("/", function (req, res) {
   res.render("home");
 });
@@ -41,18 +48,46 @@ app.post("/", function (req, res) {
   const pin = req.body.pin;
   Record.findOne({ pin: pin }, function (err, found) {
     if (found) {
-      res.redirect("/dtr");
+      const user = _.lowerCase(found.user);
+      res.redirect("/" + user);
     } else {
       console.log(err);
     }
   });
 });
 
-app.post("/dtr", function (req, res) {
-  console.log(currentTime);
-  res.render("timeInOut");
+app.get("/:user", function (req, res) {
+  const user = req.params.user;
+  Record.findOne({ user: user }, function (err, found) {
+    if (found) {
+      res.render("dtr", {
+        date: found.entry[0].date,
+        user: user,
+      });
+    }
+  });
 });
 
+app.post("/:user", function (req, res) {
+  const user = req.params.user;
+  const time = req.body.time;
+  if (time == "in") {
+    Record.findOneAndUpdate(
+      { user: user },
+      { entry: [{ date: currentDay }] },
+      function (err, found) {
+        res.redirect("/" + user);
+      }
+    );
+  } else {
+    Record.findOne({ user: user }, function (err, found) {
+      console.log(time);
+      res.redirect("/" + user);
+    });
+  }
+});
+
+///////////////////////////////////// REGISTRATION ///////////////////////////
 app.get("/register", function (req, res) {
   res.render("register");
 });

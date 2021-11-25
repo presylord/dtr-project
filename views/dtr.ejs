@@ -43,22 +43,22 @@
           py-3
         "
       >
-        <div class="w-50 text-center"><h6></h6></div>
+        <div class="w-50 text-center"><h6><%= date %></h6></div>
         <div class="w-25 text-center"><h6></h6></div>
-        <div class="w-25 text-center"><h6>Time Out</h6></div>
+        <div class="w-25 text-center"><h6></h6></div>
       </div>
 
 
       <div><form class="d-flex
       flex-row
       justify-content-evenly
-      py-3" action="/newEntry" method="post">
-        <div class="w-50 mx-auto timeInOut"><button type="submit" class=" col-6 rounded-pill btn btn-primary">
+      py-3" action="/<%= user %>"  method="post">
+        <div class="w-50 mx-auto timeInOut"><button type="submit" class=" col-6 rounded-pill btn btn-primary" name="time" value="in">
           Time In
         </button></div>
         <div class="w-50 justify-content-center timeInOut"><button
-          type="button"
-          class="timeInOut col-6 rounded-pill btn btn-light btn-outline-dark"
+          type="submit"
+          class="timeInOut col-6 rounded-pill btn btn-light btn-outline-dark" name="time" value="out"
         >
           Time Out
         </button></div>
