@@ -13,13 +13,6 @@ mongoose.connect("mongodb://localhost:27017/employeesDB");
 const recordSchema = new mongoose.Schema({
   user: String,
   pin: Number,
-  entry: [
-    {
-      date: String,
-      timeIn: String,
-      timeOut: String,
-    },
-  ],
 });
 
 const Record = mongoose.model("Record", recordSchema);
@@ -56,17 +49,16 @@ app.post("/", function (req, res) {
   });
 });
 
-app.get("/:user", function (req, res) {
-  const user = req.params.user;
-  Record.findOne({ user: user }, function (err, found) {
-    if (found) {
-      res.render("dtr", {
-        date: found.entry[0].date,
-        user: user,
-      });
-    }
-  });
-});
+// app.get("/:user", function (req, res) {
+//   const user = req.params.user;
+//   Record.findOne({ user: user }, function (err, record) {
+//     console.log(record);
+//     // res.render("dtr", {
+//     //   date: ,
+//     //   user: user,
+//     // });
+//   });
+// });
 
 app.post("/:user", function (req, res) {
   const user = req.params.user;
@@ -95,7 +87,7 @@ app.get("/register", function (req, res) {
 app.post("/register", function (req, res) {
   const user = req.body.employeeName;
   const pin = req.body.pin;
-
+  console.log(user);
   const newUser = new Record({ user: user, pin: pin });
 
   newUser.save(function (err) {
