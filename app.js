@@ -87,7 +87,7 @@ app.get("/register", function (req, res) {
 app.post("/register", function (req, res) {
   const user = req.body.employeeName;
   const pin = req.body.pin;
-  console.log(user);
+  console.log();
   const newUser = new Record({ user: user, pin: pin });
 
   newUser.save(function (err) {
