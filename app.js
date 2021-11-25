@@ -13,6 +13,11 @@ mongoose.connect("mongodb://localhost:27017/employeesDB");
 const recordSchema = new mongoose.Schema({
   user: String,
   pin: Number,
+  entry: {
+    date: String,
+    timeIn: String,
+    timeOut: String,
+  },
 });
 
 const Record = mongoose.model("Record", recordSchema);
@@ -32,53 +37,6 @@ const day = {
 const currentDay = today.toLocaleString("en-US", day);
 const currentTime = today.toLocaleString("en-US", time);
 
-/////////////////////////////////////////////////////////////////
-app.get("/", function (req, res) {
-  res.render("home");
-});
-
-app.post("/", function (req, res) {
-  const pin = req.body.pin;
-  Record.findOne({ pin: pin }, function (err, found) {
-    if (found) {
-      const user = _.lowerCase(found.user);
-      res.redirect("/" + user);
-    } else {
-      console.log(err);
-    }
-  });
-});
-
-// app.get("/:user", function (req, res) {
-//   const user = req.params.user;
-//   Record.findOne({ user: user }, function (err, record) {
-//     console.log(record);
-//     // res.render("dtr", {
-//     //   date: ,
-//     //   user: user,
-//     // });
-//   });
-// });
-
-app.post("/:user", function (req, res) {
-  const user = req.params.user;
-  const time = req.body.time;
-  if (time == "in") {
-    Record.findOneAndUpdate(
-      { user: user },
-      { entry: [{ date: currentDay }] },
-      function (err, found) {
-        res.redirect("/" + user);
-      }
-    );
-  } else {
-    Record.findOne({ user: user }, function (err, found) {
-      console.log(time);
-      res.redirect("/" + user);
-    });
-  }
-});
-
 ///////////////////////////////////// REGISTRATION ///////////////////////////
 app.get("/register", function (req, res) {
   res.render("register");
@@ -87,8 +45,15 @@ app.get("/register", function (req, res) {
 app.post("/register", function (req, res) {
   const user = req.body.employeeName;
   const pin = req.body.pin;
-  console.log();
-  const newUser = new Record({ user: user, pin: pin });
+  const newUser = new Record({
+    user: user,
+    pin: pin,
+    entry: {
+      date: "",
+      timeIn: "",
+      timeOut: "",
+    },
+  });
 
   newUser.save(function (err) {
     if (!err) {
@@ -98,6 +63,73 @@ app.post("/register", function (req, res) {
       console.log(err);
     }
   });
+});
+///////////////////////////////////// Functions ////////////////////////////////////
+app.get("/", function (req, res) {
+  res.render("home");
+});
+
+app.post("/", function (req, res) {
+  const name = req.body.employeeName;
+  const pin = req.body.pin;
+  Record.findOne({ user: name, pin: pin }, function (err, found) {
+    if (found) {
+      const user = _.lowerCase(found.user);
+      res.redirect("/" + user);
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+///////////////////////////////////////////////////////////////////////////////////
+
+app.get("/:user", function (req, res) {
+  const user = req.params.user;
+  Record.findOne({ user: user }, function (err, record) {
+    res.render("dtr", {
+      user: user,
+      date: record.entry.date,
+      timeIn: record.entry.timeIn,
+      timeOut: record.entry.timeOut,
+    });
+  });
+});
+
+app.post("/:user", function (req, res) {
+  const user = req.params.user;
+  const time = req.body.time;
+  if (time == "in") {
+    Record.findOneAndUpdate(
+      { user: user },
+      {
+        entry: [
+          {
+            date: currentDay,
+            timeIn: currentTime,
+            timeOut: "",
+          },
+        ],
+      },
+      function (err, found) {
+        res.redirect("/" + user);
+      }
+    );
+  }
+  // try making the entries into a different array
+  else {
+    Record.findOneAndUpdate(
+      { user: user, timeOut: "" },
+      {
+        $set: {
+          "entry.$": currentTime,
+        },
+      },
+      function (err, found) {
+        res.redirect("/" + user);
+      }
+    );
+  }
 });
 
 app.listen(3000, function () {
