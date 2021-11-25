@@ -11,6 +11,7 @@ mongoose.connect("mongodb://localhost:27017/employeesDB");
 
 const recordSchema = new mongoose.Schema({
   user: "string",
+  pin: "Number",
   timeIn: "string",
   timeOut: "string",
 });
@@ -26,21 +27,49 @@ const day = {
   year: "numeric",
   month: "numeric",
   day: "numeric",
+  weekday: "short",
 };
 
 const currentDay = today.toLocaleString("en-US", day);
 const currentTime = today.toLocaleString("en-US", time);
-console.log(currentTime, currentDay);
 
 app.get("/", function (req, res) {
   res.render("home");
 });
 
 app.post("/", function (req, res) {
-  console.log(req.body.employeeID);
-  res.render("timeInOut", {
-    date: currentDay,
-    time: currentTime,
+  const pin = req.body.pin;
+  Record.findOne({ pin: pin }, function (err, found) {
+    if (found) {
+      res.render("timeInOut");
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+app.post("/newEntry", function (req, res) {
+  console.log(currentTime);
+  res.render("timeInOut");
+});
+
+app.get("/register", function (req, res) {
+  res.render("register");
+});
+
+app.post("/register", function (req, res) {
+  const user = req.body.employeeName;
+  const pin = req.body.pin;
+
+  const newUser = new Record({ user: user, pin: pin });
+
+  newUser.save(function (err) {
+    if (!err) {
+      console.log("Employee added succesfully.");
+      res.redirect("/");
+    } else {
+      console.log(err);
+    }
   });
 });
 

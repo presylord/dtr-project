@@ -16,77 +16,59 @@
     <link rel="stylesheet" href="/css/styles.css" />
   </head>
   <body>
-    <h1><%= date+", " + time %></h1>
-
     <div class="list-group">
-      <a
-        role="button"
-        class="list-group-item list-group-item-action d-flex gap-3 py-3"
-        aria-current="true"
+      <div
+        class="
+          bg-primary
+          list-group-item
+          d-flex
+          gap-3
+          flex-row
+          justify-content-evenly
+          py-3
+        "
       >
-        <img
-          src="https://github.com/twbs.png"
-          alt="twbs"
-          width="32"
-          height="32"
-          class="rounded-circle flex-shrink-0"
-        />
-        <div class="d-flex gap-2 w-100 justify-content-between">
-          <div>
-            <h6 class="mb-0">List group item heading</h6>
-            <p class="mb-0 opacity-75">
-              Some placeholder content in a paragraph.
-            </p>
-          </div>
-          <small class="opacity-50 text-nowrap">now</small>
-        </div>
-      </a>
-      <a
-        href="#"
-        class="list-group-item list-group-item-action d-flex gap-3 py-3"
-        aria-current="true"
+        <div class="w-50 text-center"><h6>Date</h6></div>
+        <div class="w-25 text-center"><h6>Time In</h6></div>
+        <div class="w-25 text-center"><h6>Time Out</h6></div>
+      </div>
+      <div
+        class="
+          bg-light
+          list-group-item
+          d-flex
+          gap-3
+          flex-row
+          justify-content-evenly
+          py-3
+        "
       >
-        <img
-          src="https://github.com/twbs.png"
-          alt="twbs"
-          width="32"
-          height="32"
-          class="rounded-circle flex-shrink-0"
-        />
-        <div class="d-flex gap-2 w-100 justify-content-between">
-          <div>
-            <h6 class="mb-0">Another title here</h6>
-            <p class="mb-0 opacity-75">
-              Some placeholder content in a paragraph that goes a little longer
-              so it wraps to a new line.
-            </p>
-          </div>
-          <small class="opacity-50 text-nowrap">3d</small>
-        </div>
-      </a>
-      <a
-        href="#"
-        class="list-group-item list-group-item-action d-flex gap-3 py-3"
-        aria-current="true"
-      >
-        <img
-          src="https://github.com/twbs.png"
-          alt="twbs"
-          width="32"
-          height="32"
-          class="rounded-circle flex-shrink-0"
-        />
-        <div class="d-flex gap-2 w-100 justify-content-between">
-          <div>
-            <h6 class="mb-0">Third heading</h6>
-            <p class="mb-0 opacity-75">
-              Some placeholder content in a paragraph.
-            </p>
-          </div>
-          <small class="opacity-50 text-nowrap">1w</small>
-        </div>
-      </a>
+        <div class="w-50 text-center"><h6></h6></div>
+        <div class="w-25 text-center"><h6></h6></div>
+        <div class="w-25 text-center"><h6>Time Out</h6></div>
+      </div>
+
+
+      <div><form class="d-flex
+      flex-row
+      justify-content-evenly
+      py-3" action="/newEntry" method="post">
+        <div class="w-50 mx-auto timeInOut"><button type="submit" class=" col-6 rounded-pill btn btn-primary">
+          Time In
+        </button></div>
+        <div class="w-50 justify-content-center timeInOut"><button
+          type="button"
+          class="timeInOut col-6 rounded-pill btn btn-light btn-outline-dark"
+        >
+          Time Out
+        </button></div>
+      </form>
+      </div>
     </div>
+    </div>
+
+    
+    
 
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
