@@ -48,11 +48,6 @@ app.post("/register", function (req, res) {
   const newUser = new Record({
     user: user,
     pin: pin,
-    entry: {
-      date: "",
-      timeIn: "",
-      timeOut: "",
-    },
   });
 
   newUser.save(function (err) {
@@ -77,7 +72,7 @@ app.post("/", function (req, res) {
       const user = _.lowerCase(found.user);
       res.redirect("/" + user);
     } else {
-      console.log(err);
+      console.log("Error in / Post");
     }
   });
 });
@@ -103,13 +98,11 @@ app.post("/:user", function (req, res) {
     Record.findOneAndUpdate(
       { user: user },
       {
-        entry: [
-          {
-            date: currentDay,
-            timeIn: currentTime,
-            timeOut: "",
-          },
-        ],
+        entry: {
+          date: currentDay,
+          timeIn: currentTime,
+          timeOut: "",
+        },
       },
       function (err, found) {
         res.redirect("/" + user);
@@ -119,14 +112,14 @@ app.post("/:user", function (req, res) {
   // try making the entries into a different array
   else {
     Record.findOneAndUpdate(
-      { user: user, timeOut: "" },
-      {
-        $set: {
-          "entry.$": currentTime,
-        },
-      },
-      function (err, found) {
-        res.redirect("/" + user);
+      { user: user },
+      { $set: { "entry.timeOut": currentTime } },
+      function (err) {
+        if (!err) {
+          res.redirect("/" + user);
+        } else {
+          console.log(err);
+        }
       }
     );
   }
