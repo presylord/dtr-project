@@ -11,7 +11,7 @@ const db = knex({
     port: 5432,
     user: "postgres",
     password: "aptxn4869",
-    database: "daily_record",
+    database: "users",
   },
 });
 
@@ -20,42 +20,24 @@ app.use(express.static("public"));
 app.set("view engine", "ejs");
 
 //////////////////////////// Current Date ///////////////////////
-const today = new Date();
-const time = {
-  hour: "2-digit",
-  minute: "2-digit",
-};
-const day = {
-  year: "numeric",
-  month: "numeric",
-  day: "numeric",
-  weekday: "short",
-};
-const currentDay = today.toLocaleString("en-US", day);
-const currentTime = today.toLocaleString("en-US", time);
-
+const date = new Date().toISOString().slice(0, 10);
 ///////////////////////////////////// REGISTRATION ///////////////////////////
 app.get("/register", function (req, res) {
   res.render("register");
 });
 
 app.post("/register", function (req, res) {
-  const firstName = req.body.firstName;
-  const lastName = req.body.lastName;
+  const userName = req.body.userName;
   const pin = req.body.pin;
-  const email = req.body.email;
-  db("users")
+  db("user_info")
     .insert({
-      first_name: firstName,
-      last_name: lastName,
-      email: email,
-    })
-    .then(console.log("Employee added succesfully."));
-  db("login")
-    .insert({
+      username: userName,
       pin: pin,
+      joined: new Date(),
     })
-    .then(console.log("Pin added succesfully."));
+    .then((response) => {
+      res.redirect("/");
+    });
 });
 ///////////////////////////////////// Functions ////////////////////////////////////
 app.get("/", function (req, res) {
@@ -63,39 +45,48 @@ app.get("/", function (req, res) {
 });
 
 app.post("/", function (req, res) {
-  const name = req.body.employeeName;
+  const username = req.body.userName;
   const pin = req.body.pin;
-  Record.findOne({ user: name, pin: pin }, function (err, found) {
-    if (found) {
-      const user = _.lowerCase(found.user);
-      res.redirect("/" + user);
-    } else {
-      console.log("Error in / Post");
-    }
-  });
+  db.select("*")
+    .from("user_info")
+    .where("username", username)
+    .andWhere("pin", pin)
+    .then((user) => {
+      res.redirect("/" + username);
+    });
 });
 
 ///////////////////////////////////////////////////////////////////////////////////
 
 app.get("/:user", function (req, res) {
   const user = req.params.user;
-  res.render("dtr", {
-    user: user,
-  });
+
+  res.render("dtr", { user: user });
 });
 
 app.post("/:user", function (req, res) {
   const user = req.params.user;
   const time = req.body.time;
   if (time == "in") {
-  }
-  // try making the entries into a different array
-  else {
+    db("user_entry")
+      .insert({
+        username: user,
+        date: currentDay,
+        time_in: currentTime,
+        time_out: "",
+      })
+      .then((response) => {
+        res.redirect("/" + user);
+      });
+  } else {
+    console.log(err);
   }
 });
 
 app.listen(3000, function () {
   console.log("Server started at port 3000.");
+  console.log(date);
+  console.log(date);
 });
 
 // CREATE TABLE users (
