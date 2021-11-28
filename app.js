@@ -20,7 +20,26 @@ app.use(express.static("public"));
 app.set("view engine", "ejs");
 
 //////////////////////////// Current Date ///////////////////////
-const date = new Date().toISOString().slice(0, 10);
+let current_datetime = new Date();
+let date =
+  current_datetime.getFullYear() +
+  "-" +
+  (current_datetime.getMonth() + 1) +
+  "-" +
+  current_datetime.getDate() +
+  " " +
+  current_datetime.getHours() +
+  ":" +
+  current_datetime.getMinutes() +
+  ":" +
+  current_datetime.getSeconds();
+let time =
+  current_datetime.getHours() +
+  ":" +
+  current_datetime.getMinutes() +
+  ":" +
+  current_datetime.getSeconds();
+
 ///////////////////////////////////// REGISTRATION ///////////////////////////
 app.get("/register", function (req, res) {
   res.render("register");
@@ -60,8 +79,12 @@ app.post("/", function (req, res) {
 
 app.get("/:user", function (req, res) {
   const user = req.params.user;
-
-  res.render("dtr", { user: user });
+  db.select("*")
+    .from("user_entry")
+    .where("username", username)
+    .then((user) => {
+      res.render("dtr", { user: user });
+    });
 });
 
 app.post("/:user", function (req, res) {
@@ -71,13 +94,13 @@ app.post("/:user", function (req, res) {
     db("user_entry")
       .insert({
         username: user,
-        date: currentDay,
-        time_in: currentTime,
-        time_out: "",
+        date: date,
+        // time_in: time,
       })
       .then((response) => {
         res.redirect("/" + user);
-      });
+      })
+      .catch((err) => console.log("error"));
   } else {
     console.log(err);
   }
@@ -85,8 +108,6 @@ app.post("/:user", function (req, res) {
 
 app.listen(3000, function () {
   console.log("Server started at port 3000.");
-  console.log(date);
-  console.log(date);
 });
 
 // CREATE TABLE users (
