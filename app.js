@@ -84,9 +84,9 @@ app.get("/:user", function (req, res) {
   Record.findOne({ user: user }, function (err, record) {
     res.render("dtr", {
       user: user,
-      date: entry.date,
-      timeIn: "",
-      timeOut: "",
+      date: record.entry.date,
+      timeIn: record.entry.timeIn,
+      timeOut: record.entry.timeOut,
     });
   });
 });
@@ -115,7 +115,8 @@ app.post("/:user", function (req, res) {
   else {
     Record.findOneAndUpdate(
       { user: user },
-      { $set: { "entry.[0].timeOut": currentTime } },
+      { "entry.timeOut": currentTime },
+
       function (err) {
         if (!err) {
           res.redirect("/" + user);
