@@ -1,26 +1,23 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const _ = require("lodash");
 const ejs = require("ejs");
-
 const app = express();
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static("public"));
-app.set("view engine", "ejs");
+const knex = require("knex");
 
-mongoose.connect("mongodb://localhost:27017/employeesDB");
-
-const recordSchema = new mongoose.Schema({
-  user: String,
-  pin: Number,
-  entry: {
-    date: String,
-    timeIn: String,
-    timeOut: String,
+const db = knex({
+  client: "pg",
+  connection: {
+    host: "127.0.0.1",
+    port: 5432,
+    user: "postgres",
+    password: "aptxn4869",
+    database: "daily_record",
   },
 });
 
-const Record = mongoose.model("Record", recordSchema);
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static("public"));
+app.set("view engine", "ejs");
 
 //////////////////////////// Current Date ///////////////////////
 const today = new Date();
@@ -43,21 +40,22 @@ app.get("/register", function (req, res) {
 });
 
 app.post("/register", function (req, res) {
-  const user = req.body.employeeName;
+  const firstName = req.body.firstName;
+  const lastName = req.body.lastName;
   const pin = req.body.pin;
-  const newUser = new Record({
-    user: user,
-    pin: pin,
-  });
-
-  newUser.save(function (err) {
-    if (!err) {
-      console.log("Employee added succesfully.");
-      res.redirect("/");
-    } else {
-      console.log(err);
-    }
-  });
+  const email = req.body.email;
+  db("users")
+    .insert({
+      first_name: firstName,
+      last_name: lastName,
+      email: email,
+    })
+    .then(console.log("Employee added succesfully."));
+  db("login")
+    .insert({
+      pin: pin,
+    })
+    .then(console.log("Pin added succesfully."));
 });
 ///////////////////////////////////// Functions ////////////////////////////////////
 app.get("/", function (req, res) {
@@ -81,13 +79,8 @@ app.post("/", function (req, res) {
 
 app.get("/:user", function (req, res) {
   const user = req.params.user;
-  Record.findOne({ user: user }, function (err, record) {
-    res.render("dtr", {
-      user: user,
-      date: record.entry.date,
-      timeIn: record.entry.timeIn,
-      timeOut: record.entry.timeOut,
-    });
+  res.render("dtr", {
+    user: user,
   });
 });
 
@@ -95,39 +88,27 @@ app.post("/:user", function (req, res) {
   const user = req.params.user;
   const time = req.body.time;
   if (time == "in") {
-    Record.findOneAndUpdate(
-      { user: user },
-      {
-        entry: [
-          {
-            date: currentDay,
-            timeIn: currentTime,
-            timeOut: "",
-          },
-        ],
-      },
-      function (err, found) {
-        res.redirect("/" + user);
-      }
-    );
   }
   // try making the entries into a different array
   else {
-    Record.findOneAndUpdate(
-      { user: user },
-      { "entry.timeOut": currentTime },
-
-      function (err) {
-        if (!err) {
-          res.redirect("/" + user);
-        } else {
-          console.log(err);
-        }
-      }
-    );
   }
 });
 
 app.listen(3000, function () {
   console.log("Server started at port 3000.");
 });
+
+// CREATE TABLE users (
+//   user_id SERIAL NOT NULL PRIMARY KEY,
+//   first_name VARCHAR(50) NOT NULL,
+//   last_name VARCHAR(50) NOT NULL,
+//   email VARCHAR(50) NOT NULL
+// );
+
+// CREATE TABLE login (
+//   id SERIAL NOT NULL PRIMARY KEY,
+//   user_id INT NOT NULL,
+//   pin INT NOT NULL,
+//   FOREIGN KEY (user_id) REFERENCES users(user_id)
+
+// );
