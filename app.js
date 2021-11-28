@@ -43,13 +43,17 @@ app.get("/register", function (req, res) {
 app.post("/register", function (req, res) {
   const userName = req.body.userName;
   const pin = req.body.pin;
-  db("user_info")
+  db("user_info").insert({
+    username: userName,
+    pin: pin,
+    joined: new Date(),
+  });
+  db("user_entry")
     .insert({
       username: userName,
-      pin: pin,
-      joined: new Date(),
     })
     .then((response) => {
+      console.log("logged successfully");
       res.redirect("/");
     });
 });
@@ -74,14 +78,7 @@ app.post("/", function (req, res) {
 
 app.get("/:user", function (req, res) {
   const user = req.params.user;
-  db("user_entry")
-    .insert({
-      username: user,
-      date: dateToday,
-    })
-    .then((response) => {
-      console.log("logged successfully");
-    });
+
   res.render("dtr", { user: user });
 });
 app.post("/:user", function (req, res) {
@@ -93,6 +90,7 @@ app.post("/:user", function (req, res) {
       .whereNotNull("date")
       .whereNull("time_in")
       .update({
+        date: dateToday,
         time_in: timeToday,
       })
       .catch((err) => console.log(err));
