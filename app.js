@@ -50,7 +50,6 @@ app.post("/register", function (req, res) {
   const newUser = new Record({
     user: user,
     pin: pin,
-    entry: [],
   });
 
   newUser.save(function (err) {
@@ -85,45 +84,48 @@ app.post("/", function (req, res) {
 app.get("/:user", function (req, res) {
   const user = req.params.user;
   Record.findOne({ user: user }, function (err, record) {
+    console.log(record.date);
     res.render("dtr", {
       user: user,
-      // date: record.entry.date,
-      // timeIn: record.entry.timeIn,
-      // timeOut: record.entry.timeOut,
+      // date: record.entry[0].date,
+      // timeIn: record.entry[0].timeIn,
+      // timeOut: record.entry[0].timeOut,
     });
   });
 });
 
+var entry = {
+  user: "",
+  date: "",
+  timeIn: "",
+  timeOut: "",
+};
 app.post("/:user", function (req, res) {
   const user = req.params.user;
   const time = req.body.time;
+
   if (time == "in") {
+    entry.user = user;
+    entry.date = currentDay;
+    entry.timeIn = currentTime;
+    console.log(entry);
     Record.findOneAndUpdate(
       { user: user },
       {
-        entry: [
-          {
-            date: currentDay,
-          },
-        ],
+        entry: [entry],
       },
       function (err, found) {
         res.redirect("/" + user);
       }
     );
-  }
-  // try making the entries into a different array
-  else if (time == "out") {
+  } else if (time == "out") {
+    entry.timeOut = currentTime;
+    console.log(entry);
     Record.findOneAndUpdate(
       { user: user, timeOut: "" },
       {
-        entry: {
-          date: date,
-          timeIn: timeIn,
-          timeOut: currentTime,
-        },
+        entry: [entry],
       },
-      { new: true },
       function (err, found) {
         res.redirect("/" + user);
       }
