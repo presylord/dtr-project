@@ -13,11 +13,13 @@ mongoose.connect("mongodb://localhost:27017/employeesDB");
 const recordSchema = new mongoose.Schema({
   user: String,
   pin: Number,
-  entry: {
-    date: String,
-    timeIn: String,
-    timeOut: String,
-  },
+  entry: [
+    {
+      date: String,
+      timeIn: String,
+      timeOut: String,
+    },
+  ],
 });
 
 const Record = mongoose.model("Record", recordSchema);
@@ -48,11 +50,7 @@ app.post("/register", function (req, res) {
   const newUser = new Record({
     user: user,
     pin: pin,
-    entry: {
-      date: "",
-      timeIn: "",
-      timeOut: "",
-    },
+    entry: [],
   });
 
   newUser.save(function (err) {
@@ -89,9 +87,9 @@ app.get("/:user", function (req, res) {
   Record.findOne({ user: user }, function (err, record) {
     res.render("dtr", {
       user: user,
-      date: record.entry.date,
-      timeIn: record.entry.timeIn,
-      timeOut: record.entry.timeOut,
+      // date: record.entry.date,
+      // timeIn: record.entry.timeIn,
+      // timeOut: record.entry.timeOut,
     });
   });
 });
@@ -106,8 +104,6 @@ app.post("/:user", function (req, res) {
         entry: [
           {
             date: currentDay,
-            timeIn: currentTime,
-            timeOut: "",
           },
         ],
       },
@@ -117,14 +113,17 @@ app.post("/:user", function (req, res) {
     );
   }
   // try making the entries into a different array
-  else {
+  else if (time == "out") {
     Record.findOneAndUpdate(
       { user: user, timeOut: "" },
       {
-        $set: {
-          "entry.$": currentTime,
+        entry: {
+          date: date,
+          timeIn: timeIn,
+          timeOut: currentTime,
         },
       },
+      { new: true },
       function (err, found) {
         res.redirect("/" + user);
       }
