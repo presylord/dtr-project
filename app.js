@@ -1,5 +1,4 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const _ = require("lodash");
 const ejs = require("ejs");
 
@@ -7,20 +6,6 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.set("view engine", "ejs");
-
-mongoose.connect("mongodb://localhost:27017/employeesDB");
-
-const recordSchema = new mongoose.Schema({
-  user: String,
-  pin: Number,
-  entry: {
-    date: String,
-    timeIn: String,
-    timeOut: String,
-  },
-});
-
-const Record = mongoose.model("Record", recordSchema);
 
 //////////////////////////// Current Date ///////////////////////
 const today = new Date();
