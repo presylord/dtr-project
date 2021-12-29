@@ -66,23 +66,8 @@ app.post("/", function (req, res) {
 
 app.get("/:user", function (req, res) {
   const user = req.params.user;
-  Record.findOne({ user: user }, function (err, record) {
-    console.log(record);
-    res.render("dtr", {
-      user: user,
-      // date: record.entry[0].date,
-      // timeIn: record.entry[0].timeIn,
-      // timeOut: record.entry[0].timeOut,
-    });
-  });
 });
 
-var entry = {
-  user: "",
-  date: "",
-  timeIn: "",
-  timeOut: "",
-};
 app.post("/:user", function (req, res) {
   const user = req.params.user;
   const time = req.body.time;

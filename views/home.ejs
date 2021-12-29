@@ -1,12 +1,10 @@
 <%- include('partials/header'); -%>
             <form class="mx-auto" action="/" method="post">
-                <div class="mb-3">
-                  <label for="employeeName" class="form-label">Enter Name:</label>
-                  <input type="text" class="form-control" name="employeeName" >
-                  <label for="employeeID" class="form-label">Enter Pin:</label>
-                  <input type="password" class="form-control" name="pin" >
-                </div>
-                <button
+              <div class="mb-3">
+                <input type="text" class="form-control" name="employeeName" placeholder="username" >
+                <input type="password" class="form-control" name="pin" placeholder="pin">
+              </div>
+              <button
                 type="submit"
                 class="btn btn-md btn-primary w-100 mx-0 mb-2"
               >
